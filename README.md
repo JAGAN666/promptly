@@ -180,8 +180,8 @@ Google Chrome Built-in AI Challenge 2025
 
 ## 📧 Contact
 
-- **GitHub**: [@yourusername](https://github.com/yourusername)
-- **Email**: your.email@example.com
+- **GitHub**: [Jagannath Narayanaswamy](https://github.com/JAGAN666)
+- **Email**: Jagannathn@gwmail.gwu.edu
 
 ---
 
