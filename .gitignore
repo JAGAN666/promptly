@@ -1,0 +1,29 @@
+# API Configuration (contains sensitive keys)
+config.js
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Temporary files
+*.tmp
+*.bak
+*~
+
+# Node modules (if any)
+node_modules/
+
+# Chrome extension package
+*.crx
+*.pem
+*.zip
+
+# Personal notes
+notes.txt
+TODO.txt

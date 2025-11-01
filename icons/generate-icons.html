@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Generate ArgumentArmor Icons</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f0f0f0;
+    }
+    .icon-container {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin: 20px 0;
+    }
+    .icon-item {
+      text-align: center;
+    }
+    canvas {
+      border: 1px solid #ccc;
+      background: white;
+      border-radius: 8px;
+    }
+    button {
+      margin: 10px 5px;
+      padding: 10px 20px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button:hover {
+      background: #5568d3;
+    }
+    .instructions {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>ArgumentArmor Icon Generator</h1>
+
+  <div class="instructions">
+    <h2>Instructions:</h2>
+    <ol>
+      <li>Click "Generate All Icons" button below</li>
+      <li>Right-click each icon and select "Save image as..."</li>
+      <li>Save with the exact filenames shown (icon16.png, icon32.png, etc.)</li>
+      <li>Save all icons to the /icons/ folder</li>
+    </ol>
+  </div>
+
+  <button onclick="generateAllIcons()">Generate All Icons</button>
+
+  <div class="icon-container" id="iconContainer"></div>
+
+  <script>
+    function drawShieldIcon(canvas, size) {
+      const ctx = canvas.getContext('2d');
+      const centerX = size / 2;
+      const centerY = size / 2;
+      const scale = size / 100;
+
+      // Clear canvas
+      ctx.clearRect(0, 0, size, size);
+
+      // Draw gradient background circle
+      const gradient = ctx.createLinearGradient(0, 0, size, size);
+      gradient.addColorStop(0, '#667eea');
+      gradient.addColorStop(1, '#764ba2');
+
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, size * 0.45, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Draw shield shape
+      ctx.fillStyle = 'white';
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY - 20 * scale);
+
+      // Top
+      ctx.lineTo(centerX - 15 * scale, centerY - 20 * scale);
+      ctx.lineTo(centerX - 15 * scale, centerY - 10 * scale);
+
+      // Left side
+      ctx.lineTo(centerX - 15 * scale, centerY + 5 * scale);
+
+      // Bottom point
+      ctx.quadraticCurveTo(
+        centerX - 15 * scale,
+        centerY + 15 * scale,
+        centerX,
+        centerY + 22 * scale
+      );
+
+      ctx.quadraticCurveTo(
+        centerX + 15 * scale,
+        centerY + 15 * scale,
+        centerX + 15 * scale,
+        centerY + 5 * scale
+      );
+
+      // Right side
+      ctx.lineTo(centerX + 15 * scale, centerY - 10 * scale);
+      ctx.lineTo(centerX + 15 * scale, centerY - 20 * scale);
+
+      ctx.closePath();
+      ctx.fill();
+
+      // Draw checkmark
+      ctx.strokeStyle = '#667eea';
+      ctx.lineWidth = 3 * scale;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      ctx.beginPath();
+      ctx.moveTo(centerX - 8 * scale, centerY);
+      ctx.lineTo(centerX - 2 * scale, centerY + 6 * scale);
+      ctx.lineTo(centerX + 10 * scale, centerY - 6 * scale);
+      ctx.stroke();
+    }
+
+    function generateIcon(size) {
+      const container = document.getElementById('iconContainer');
+
+      const iconItem = document.createElement('div');
+      iconItem.className = 'icon-item';
+
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      canvas.id = `icon${size}`;
+
+      const label = document.createElement('p');
+      label.textContent = `icon${size}.png`;
+
+      const downloadBtn = document.createElement('button');
+      downloadBtn.textContent = `Download ${size}x${size}`;
+      downloadBtn.onclick = () => downloadIcon(canvas, `icon${size}.png`);
+
+      iconItem.appendChild(canvas);
+      iconItem.appendChild(label);
+      iconItem.appendChild(downloadBtn);
+      container.appendChild(iconItem);
+
+      drawShieldIcon(canvas, size);
+    }
+
+    function downloadIcon(canvas, filename) {
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    function generateAllIcons() {
+      const container = document.getElementById('iconContainer');
+      container.innerHTML = '';
+
+      [16, 32, 48, 128].forEach(size => {
+        generateIcon(size);
+      });
+    }
+
+    // Auto-generate on load
+    window.onload = () => {
+      generateAllIcons();
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Promptly</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <div class="popup-header">
+      <div class="logo">
+        <span class="icon">🧠</span>
+        <h1>Promptly</h1>
+      </div>
+      <div class="tagline">Intelligent Analysis, Instantly</div>
+    </div>
+
+    <div class="popup-content">
+      <!-- Page Analysis Section -->
+      <div class="analyze-section">
+        <button id="analyze-page-btn" class="primary-btn">
+          <span>📖 Analyze Current Page</span>
+        </button>
+        <div id="page-status" class="page-status"></div>
+      </div>
+
+      <!-- Content Preview -->
+      <div id="content-preview" class="content-preview" style="display: none;">
+        <h3>Detected Content</h3>
+        <div id="preview-text" class="preview-text"></div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div id="action-buttons" class="action-buttons" style="display: none;">
+        <button id="summarize-btn" class="action-btn">
+          <span>📝 Summarize</span>
+        </button>
+        <button id="generate-replies-btn" class="action-btn">
+          <span>💬 Generate Replies</span>
+        </button>
+      </div>
+
+      <!-- Advanced Features Section -->
+      <div id="advanced-features" class="advanced-features" style="display: none;">
+        <h3>🔬 Advanced Features</h3>
+        <div class="advanced-grid">
+          <button id="argument-analyzer-btn" class="advanced-btn">
+            <span class="adv-icon">🛡️</span>
+            <span class="adv-name">Argument Analyzer</span>
+          </button>
+          <button id="sentiment-btn" class="advanced-btn">
+            <span class="adv-icon">😊</span>
+            <span class="adv-name">Sentiment</span>
+          </button>
+          <button id="toxicity-btn" class="advanced-btn">
+            <span class="adv-icon">🛡️</span>
+            <span class="adv-name">Toxicity Shield</span>
+          </button>
+          <button id="debate-btn" class="advanced-btn">
+            <span class="adv-icon">⚖️</span>
+            <span class="adv-name">Debate Mode</span>
+          </button>
+          <button id="echo-chamber-btn" class="advanced-btn">
+            <span class="adv-icon">🌍</span>
+            <span class="adv-name">Echo Chamber</span>
+          </button>
+          <button id="fact-check-btn" class="advanced-btn">
+            <span class="adv-icon">✓</span>
+            <span class="adv-name">Fact Check</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Reply Style Selector -->
+      <div id="reply-options" class="reply-options" style="display: none;">
+        <h3>Choose Reply Style</h3>
+        <div class="style-grid">
+          <button class="style-btn" data-style="supportive">
+            <span class="style-icon">👍</span>
+            <span class="style-name">Supportive</span>
+          </button>
+          <button class="style-btn" data-style="questions">
+            <span class="style-icon">❓</span>
+            <span class="style-name">Questions</span>
+          </button>
+          <button class="style-btn" data-style="counter">
+            <span class="style-icon">🎯</span>
+            <span class="style-name">Counter</span>
+          </button>
+          <button class="style-btn" data-style="professional">
+            <span class="style-icon">💼</span>
+            <span class="style-name">Professional</span>
+          </button>
+        </div>
+
+        <!-- Custom Reply Input -->
+        <div class="custom-reply-section">
+          <h4>Or describe your own style:</h4>
+          <div class="custom-input-group">
+            <input
+              type="text"
+              id="custom-reply-input"
+              class="custom-input"
+              placeholder="e.g., 'make it funny' or 'be more technical'"
+            />
+            <button id="generate-custom-btn" class="custom-btn">
+              <span>✨ Generate</span>
+            </button>
+          </div>
+          <p class="custom-help">Describe the tone, style, or approach you want</p>
+        </div>
+      </div>
+
+      <!-- Results Section -->
+      <div id="results" class="results-section" style="display: none;">
+        <h3 id="results-title">Results</h3>
+        <div id="results-content"></div>
+      </div>
+
+      <!-- Loading State -->
+      <div id="loading" class="loading" style="display: none;">
+        <div class="spinner"></div>
+        <p id="loading-text">Analyzing content...</p>
+      </div>
+
+      <!-- Settings Section (Collapsible) -->
+      <div class="settings-section" id="settings-section" style="display: none;">
+        <h3>Settings</h3>
+        <div class="setting-item">
+          <label for="api-key-input">Gemini API Key</label>
+          <div class="api-key-container">
+            <input
+              type="password"
+              id="api-key-input"
+              placeholder="Enter your Gemini API key..."
+            />
+            <button id="save-api-key" class="save-btn">Save</button>
+          </div>
+          <p class="setting-help">
+            Get your free API key from <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a>
+          </p>
+        </div>
+
+        <!-- Google Search API Settings (for enhanced fact-checking) -->
+        <div class="setting-item">
+          <label for="google-search-key-input">Google Custom Search API Key (Optional)</label>
+          <div class="api-key-container">
+            <input
+              type="password"
+              id="google-search-key-input"
+              placeholder="Enter Google Search API key..."
+            />
+            <button id="save-search-key" class="save-btn">Save</button>
+          </div>
+          <p class="setting-help">
+            For enhanced fact-checking with web search. Get from <a href="https://developers.google.com/custom-search/v1/overview" target="_blank">Google Custom Search API</a>
+          </p>
+        </div>
+
+        <div class="setting-item">
+          <label for="search-engine-id-input">Search Engine ID (Optional)</label>
+          <div class="api-key-container">
+            <input
+              type="text"
+              id="search-engine-id-input"
+              placeholder="Enter Search Engine ID..."
+            />
+            <button id="save-search-engine-id" class="save-btn">Save</button>
+          </div>
+          <p class="setting-help">
+            Create a search engine at <a href="https://programmablesearchengine.google.com/" target="_blank">Programmable Search Engine</a>
+          </p>
+        </div>
+      </div>
+
+      <div class="footer">
+        <a href="#" id="settings-toggle" class="footer-link">⚙️ Settings</a>
+        <span class="separator">•</span>
+        <a href="#" id="clear-history" class="footer-link">Clear History</a>
+        <span class="separator">•</span>
+        <span id="platform-indicator" class="platform-indicator"></span>
+      </div>
+    </div>
+  </div>
+  <script src="../config.js"></script>
+  <script src="../chrome-ai.js"></script>
+  <script src="../web-search.js"></script>
+  <script src="../fact-check-apis.js"></script>
+  <script src="../argument-analyzer.js"></script>
+  <script src="../advanced-features.js"></script>
+  <script src="../popup-advanced-handlers.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

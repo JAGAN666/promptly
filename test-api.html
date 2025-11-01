@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gemini API Tester</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #4285f4;
+            padding-bottom: 10px;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        button {
+            background: #4285f4;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #357ae8;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            border: 1px solid #e0e0e0;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .success {
+            background: #e8f5e9;
+            border-color: #4caf50;
+            color: #2e7d32;
+        }
+        .error {
+            background: #ffebee;
+            border-color: #f44336;
+            color: #c62828;
+        }
+        .working-model {
+            background: #e3f2fd;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #2196f3;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #fafafa;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Gemini API Model Tester</h1>
+        <p>This tool helps identify which Gemini models are available for your API key.</p>
+
+        <input type="password" id="apiKey" placeholder="Enter your Gemini API key (starts with AIza...)" />
+
+        <div class="test-section">
+            <h2>Step 1: List Available Models</h2>
+            <button onclick="listModels()">📋 List All Available Models</button>
+            <div id="modelsList"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Step 2: Test Common Models</h2>
+            <button onclick="testAllModels()">🧪 Test All Common Models</button>
+            <div id="testResults"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Step 3: Test Specific Model</h2>
+            <input type="text" id="modelName" placeholder="Enter model name (e.g., gemini-1.5-flash)" />
+            <button onclick="testSpecificModel()">🎯 Test This Model</button>
+            <div id="specificResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Working Models</h2>
+            <div id="workingModels"></div>
+        </div>
+    </div>
+
+    <script>
+        const workingModelsList = [];
+
+        // List all available models
+        async function listModels() {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            if (!apiKey) {
+                alert('Please enter your API key first');
+                return;
+            }
+
+            const resultsDiv = document.getElementById('modelsList');
+            resultsDiv.innerHTML = '<div class="result">Loading...</div>';
+
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error?.message || 'Failed to list models');
+                }
+
+                let modelInfo = 'AVAILABLE MODELS:\n\n';
+                if (data.models) {
+                    data.models.forEach(model => {
+                        modelInfo += `📦 ${model.name}\n`;
+                        modelInfo += `   Display: ${model.displayName}\n`;
+                        modelInfo += `   Methods: ${model.supportedGenerationMethods?.join(', ') || 'N/A'}\n`;
+                        modelInfo += `   Input Token Limit: ${model.inputTokenLimit || 'N/A'}\n`;
+                        modelInfo += `   Output Token Limit: ${model.outputTokenLimit || 'N/A'}\n\n`;
+                    });
+                } else {
+                    modelInfo += 'No models found';
+                }
+
+                resultsDiv.innerHTML = `<div class="result success">${modelInfo}</div>`;
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="result error">ERROR: ${error.message}</div>`;
+            }
+        }
+
+        // Test all common model names
+        async function testAllModels() {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            if (!apiKey) {
+                alert('Please enter your API key first');
+                return;
+            }
+
+            const models = [
+                // Newest models (Oct 2024)
+                'gemini-1.5-flash-002',
+                'gemini-1.5-flash-001',
+                'gemini-1.5-flash-latest',
+                'gemini-1.5-flash',
+                'gemini-1.5-flash-8b-latest',
+                'gemini-1.5-flash-8b-001',
+                'gemini-1.5-flash-8b',
+                'gemini-1.5-pro-002',
+                'gemini-1.5-pro-001',
+                'gemini-1.5-pro-latest',
+                'gemini-1.5-pro',
+                // Experimental
+                'gemini-2.0-flash-exp',
+                'gemini-exp-1121',
+                'gemini-exp-1114',
+                // Older stable
+                'gemini-1.0-pro-latest',
+                'gemini-1.0-pro-001',
+                'gemini-1.0-pro',
+                'gemini-pro-latest',
+                'gemini-pro',
+                // Legacy
+                'text-bison-001',
+                'text-bison-002'
+            ];
+
+            const resultsDiv = document.getElementById('testResults');
+            resultsDiv.innerHTML = '<div class="result">Testing models...</div>';
+
+            let results = 'MODEL TEST RESULTS:\n\n';
+            workingModelsList.length = 0;
+
+            for (const model of models) {
+                const status = await testModel(apiKey, model);
+                const emoji = status.success ? '✅' : '❌';
+                results += `${emoji} ${model}: ${status.message}\n`;
+
+                if (status.success) {
+                    workingModelsList.push(model);
+                }
+            }
+
+            resultsDiv.innerHTML = `<div class="result">${results}</div>`;
+            updateWorkingModels();
+        }
+
+        // Test a specific model
+        async function testSpecificModel() {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            const modelName = document.getElementById('modelName').value.trim();
+
+            if (!apiKey) {
+                alert('Please enter your API key first');
+                return;
+            }
+            if (!modelName) {
+                alert('Please enter a model name');
+                return;
+            }
+
+            const resultsDiv = document.getElementById('specificResult');
+            resultsDiv.innerHTML = '<div class="result">Testing...</div>';
+
+            const status = await testModel(apiKey, modelName);
+
+            if (status.success) {
+                resultsDiv.innerHTML = `<div class="result success">✅ SUCCESS!\n\nModel: ${modelName}\nResponse: ${status.message}</div>`;
+                if (!workingModelsList.includes(modelName)) {
+                    workingModelsList.push(modelName);
+                    updateWorkingModels();
+                }
+            } else {
+                resultsDiv.innerHTML = `<div class="result error">❌ FAILED!\n\nModel: ${modelName}\nError: ${status.message}</div>`;
+            }
+        }
+
+        // Test a single model
+        async function testModel(apiKey, model) {
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{ text: 'Say "Hello, I work!"' }]
+                        }],
+                        generationConfig: {
+                            temperature: 0.1,
+                            maxOutputTokens: 50
+                        }
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    return {
+                        success: false,
+                        message: data.error?.message || `HTTP ${response.status}`
+                    };
+                }
+
+                if (data.candidates && data.candidates[0]) {
+                    const text = data.candidates[0].content.parts[0].text;
+                    return {
+                        success: true,
+                        message: text.substring(0, 50)
+                    };
+                }
+
+                return {
+                    success: false,
+                    message: 'No response generated'
+                };
+            } catch (error) {
+                return {
+                    success: false,
+                    message: error.message
+                };
+            }
+        }
+
+        // Update working models display
+        function updateWorkingModels() {
+            const div = document.getElementById('workingModels');
+            if (workingModelsList.length > 0) {
+                let html = '<div class="working-model"><strong>✅ WORKING MODELS FOUND:</strong><br><br>';
+                workingModelsList.forEach(model => {
+                    html += `<code>${model}</code><br>`;
+                });
+                html += '<br><strong>Copy these model names to use in the extension!</strong></div>';
+                div.innerHTML = html;
+            } else {
+                div.innerHTML = '<div class="result">No working models found yet. Try testing models above.</div>';
+            }
+        }
+
+        // Initialize
+        updateWorkingModels();
+    </script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+/* Smart Reply Assistant - Content Styles */
+
+/* Floating button additional styles */
+#smart-reply-floating-btn {
+  /* Ensure button stays on top of everything */
+  z-index: 2147483647 !important;
+}
+
+/* Prevent text selection on the button */
+#smart-reply-floating-btn {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Animation for button appearance */
+@keyframes smartReplyFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Animation for button click */
+@keyframes smartReplyPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Active state for button */
+#smart-reply-floating-btn:active {
+  animation: smartReplyPulse 0.2s ease;
+}
+
+/* Tooltip style (optional enhancement) */
+#smart-reply-floating-btn::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  font-size: 12px;
+  border-radius: 4px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  margin-bottom: 8px;
+}
+
+#smart-reply-floating-btn:hover::after {
+  opacity: 0;  /* Disabled for now, can enable if needed */
+}
